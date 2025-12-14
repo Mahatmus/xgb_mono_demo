@@ -1,10 +1,11 @@
 FROM python:3.12-slim
 
-# Install Node.js, npm, and curl
+# Install Node.js, npm, curl, and git
 RUN apt-get update && apt-get install -y \
     curl \
     nodejs \
     npm \
+    git \
     && rm -rf /var/lib/apt/lists/*
 
 # Install uv
