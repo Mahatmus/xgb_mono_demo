@@ -7,6 +7,7 @@ Setup:
 3. Accept competition rules at kaggle.com/competitions/house-prices-advanced-regression-techniques
 """
 
+import os
 import shutil
 import zipfile
 from pathlib import Path
@@ -14,9 +15,17 @@ from pathlib import Path
 import pandas as pd
 import requests
 from dotenv import load_dotenv
-from kaggle.api.kaggle_api_extended import KaggleApi
 
+# Load environment variables BEFORE importing Kaggle API
 load_dotenv()
+
+# Set KAGGLE_KEY from KAGGLE_API_TOKEN if available
+if "KAGGLE_API_TOKEN" in os.environ and "KAGGLE_KEY" not in os.environ:
+    os.environ["KAGGLE_KEY"] = os.environ["KAGGLE_API_TOKEN"]
+    os.environ["KAGGLE_USERNAME"] = ""  # Not needed with API token
+
+# NOW import Kaggle API after environment is configured
+from kaggle.api.kaggle_api_extended import KaggleApi
 
 
 def download_california_housing(api: KaggleApi) -> None:
@@ -26,12 +35,6 @@ def download_california_housing(api: KaggleApi) -> None:
     housing_path = Path("data/housing.csv")
     if housing_path.exists():
         housing_path.rename("data/california_housing.csv")
-
-
-def download_diamonds(api: KaggleApi) -> None:
-    """Download Diamonds dataset from Kaggle."""
-    print("Downloading Diamonds...")
-    api.dataset_download_files("shivam2503/diamonds", path="data", unzip=True)
 
 
 def download_auto_mpg() -> None:
@@ -115,6 +118,21 @@ def download_energy() -> None:
     with zipfile.ZipFile(zip_path, "r") as z:
         z.extractall("data/energy_tmp")
     df = pd.read_excel("data/energy_tmp/ENB2012_data.xlsx")
+
+    # Rename columns from X1-X8, Y1-Y2 to descriptive names
+    df.columns = [
+        "Relative Compactness",
+        "Surface Area",
+        "Wall Area",
+        "Roof Area",
+        "Overall Height",
+        "Orientation",
+        "Glazing Area",
+        "Glazing Area Distribution",
+        "Heating Load",
+        "Cooling Load",
+    ]
+
     df.to_csv("data/energy_efficiency.csv", index=False)
     zip_path.unlink()
     shutil.rmtree("data/energy_tmp")
@@ -124,10 +142,10 @@ if __name__ == "__main__":
     # Initialize
     Path("data").mkdir(exist_ok=True)
     api = KaggleApi()
+    api.authenticate()
 
     # Download all datasets
     download_california_housing(api)
-    download_diamonds(api)
     download_auto_mpg()
     download_insurance(api)
     download_concrete()

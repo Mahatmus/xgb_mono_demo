@@ -2,7 +2,8 @@
 .CLAUDE.md
 
 # Data files
-data/*.csv
+*.csv
+*.png
 data/*.zip
 data/*_tmp/
 
