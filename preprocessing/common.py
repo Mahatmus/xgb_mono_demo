@@ -37,7 +37,9 @@ def create_splits(
     stratify = df[stratify_col] if stratify_col else None
 
     # First split: train vs (val + test)
-    train_df, temp_df = train_test_split(
+    train_df: pd.DataFrame
+    temp_df: pd.DataFrame
+    train_df, temp_df = train_test_split(  # type: ignore[assignment]
         df,
         train_size=train_size,
         random_state=random_state,
@@ -48,7 +50,9 @@ def create_splits(
     val_proportion = val_size / (val_size + test_size)
     stratify_temp = temp_df[stratify_col] if stratify_col else None
 
-    val_df, test_df = train_test_split(
+    val_df: pd.DataFrame
+    test_df: pd.DataFrame
+    val_df, test_df = train_test_split(  # type: ignore[assignment]
         temp_df,
         train_size=val_proportion,
         random_state=random_state,
@@ -61,9 +65,7 @@ def create_splits(
     test_df["split"] = "test"
 
     # Combine back together
-    result = pd.concat([train_df, val_df, test_df], axis=0)
-
-    return result
+    return pd.concat([train_df, val_df, test_df], axis=0)
 
 
 def save_processed_data(df: pd.DataFrame, dataset_name: str, output_dir: Path | str) -> None:

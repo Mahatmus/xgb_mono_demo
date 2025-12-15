@@ -25,7 +25,7 @@ if "KAGGLE_API_TOKEN" in os.environ and "KAGGLE_KEY" not in os.environ:
     os.environ["KAGGLE_USERNAME"] = ""  # Not needed with API token
 
 # NOW import Kaggle API after environment is configured
-from kaggle.api.kaggle_api_extended import KaggleApi
+from kaggle.api.kaggle_api_extended import KaggleApi  # noqa: E402
 
 
 def download_california_housing(api: KaggleApi) -> None:

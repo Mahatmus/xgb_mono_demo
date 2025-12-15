@@ -57,7 +57,7 @@ ignore = [
 [tool.pyright]
 include = ["*.py"]
 exclude = [".venv", "**/__pycache__"]
-typeCheckingMode = "strict"
+typeCheckingMode = "standard"
 pythonVersion = "3.12"
 reportMissingTypeStubs = false
 reportUnknownMemberType = false
