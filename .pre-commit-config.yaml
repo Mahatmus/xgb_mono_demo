@@ -21,3 +21,12 @@ repos:
     rev: v1.1.390
     hooks:
       - id: pyright
+        additional_dependencies:
+          - pandas>=2.0.0
+          - pandas-stubs>=2.0.0
+          - scikit-learn>=1.3.0
+          - matplotlib>=3.7.0
+          - types-requests>=2.31.0
+          - kaggle>=1.6.0
+          - requests>=2.31.0
+          - python-dotenv>=1.0.0

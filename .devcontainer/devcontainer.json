@@ -3,17 +3,17 @@
   "build": {
     "dockerfile": "Dockerfile"
   },
-  
+
   "workspaceFolder": "/workspace",
-  
+
   "workspaceMount": "source=${localWorkspaceFolder},target=/workspace,type=bind",
-  
+
   "mounts": [
     "source=${localEnv:HOME}/.config/gh,target=/root/.config/gh,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.ssh,target=/root/.ssh,type=bind,consistency=cached",
     "source=${localEnv:HOME}/.gitconfig,target=/root/.gitconfig,type=bind,consistency=cached"
   ],
-  
+
   "customizations": {
     "vscode": {
       "extensions": [

@@ -10,17 +10,6 @@ AveRooms (+1): Larger homes with more rooms are worth more
 AveBedrms (+1): More bedrooms indicate higher value
 
 This dataset appears in XGBoost's official monotonic constraints tutorials and requires no preprocessing—making it ideal for initial demonstrations.
-Diamonds dataset demonstrates scale
-At 53,940 rows and 10 features, the Diamonds dataset GitHub from Kaggle shows monotonic constraints working at scale. The carat-price relationship is universally understood: larger diamonds are exponentially more valuable.
-Source: https://www.kaggle.com/datasets/shivam2503/diamonds (also in seaborn: sns.load_dataset('diamonds'))
-Key monotonic variables:
-
-carat (+1): Weight is the strongest price predictor—a 2-carat diamond costs far more than twice a 1-carat
-x, y, z (+1): Physical dimensions correlate with value
-clarity (+1 when encoded): IF > VVS1 > VVS2 > VS1 > VS2 > SI1 > SI2 > I1
-cut (+1 when encoded): Ideal > Premium > Very Good > Good > Fair
-
-The nonlinear but strictly monotonic carat-price relationship perfectly illustrates why XGBoost's tree-based approach can capture complex patterns while respecting domain knowledge.
 Auto MPG showcases negative constraints
 The UCI Auto MPG dataset (398 rows, 7 features) predicts fuel efficiency UCI Machine Learning Repository where physics dictates several negative monotonic relationships—heavier vehicles and larger engines consume more fuel.
 Source: https://archive.ics.uci.edu/dataset/9/auto+mpg
@@ -72,4 +61,4 @@ Relative Compactness (-1): GitHub More compact buildings lose less heat per unit
 
 Building physics provides clear thermodynamic justifications for each constraint. The dual-target structure allows showing how the same predictors might have different constraint configurations for different objectives.
 Quick reference for implementation
-DatasetSourceRowsFeaturesBest Monotonic VariablesConstraint DirectionsCalifornia Housingsklearn20,6408MedInc, AveRoomsBoth positiveDiamondsKaggle/seaborn53,94010carat, clarity, cutAll positiveAuto MPGUCI3987weight, displacement, model_yearMostly negativeMedical InsuranceKaggle1,3387age, bmi, smokerAll positiveConcrete StrengthUCI1,0308Age, CementBoth positiveAmes HousingKaggle2,93079GrLivArea, OverallQual, YearBuiltAll positiveEnergy EfficiencyUCI7688Surface Area, CompactnessMixed (+/-)
+DatasetSourceRowsFeaturesBest Monotonic VariablesConstraint DirectionsCalifornia Housingsklearn20,6408MedInc, AveRoomsBoth positiveAuto MPGUCI3987weight, displacement, model_yearMostly negativeMedical InsuranceKaggle1,3387age, bmi, smokerAll positiveConcrete StrengthUCI1,0308Age, CementBoth positiveAmes HousingKaggle2,93079GrLivArea, OverallQual, YearBuiltAll positiveEnergy EfficiencyUCI7688Surface Area, CompactnessMixed (+/-)
