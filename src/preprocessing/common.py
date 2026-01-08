@@ -29,7 +29,7 @@ def create_splits(
     df = df.copy()
 
     if stratify_col:
-        y = df[stratify_col].values
+        y = df[stratify_col].to_numpy()
 
         # Check if stratify column is numeric (continuous) or categorical
         is_numeric = pd.api.types.is_numeric_dtype(df[stratify_col])

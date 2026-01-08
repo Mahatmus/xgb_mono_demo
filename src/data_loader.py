@@ -39,11 +39,11 @@ def load_and_prepare_data(
     train_val_df["fold"] = train_val_df["fold"].astype(int)
 
     X_train_val = train_val_df[feature_cols]
-    y_train_val = train_val_df[target_col].values
+    y_train_val = train_val_df[target_col].to_numpy()
     folds = train_val_df["fold"].values
 
     X_test = test_df[feature_cols]
-    y_test = test_df[target_col].values
+    y_test = test_df[target_col].to_numpy()
 
     # Build CV splits
     cv_splits = []

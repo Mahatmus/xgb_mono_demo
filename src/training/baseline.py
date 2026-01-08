@@ -5,7 +5,7 @@ from collections.abc import Callable
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_percentage_error
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor  # type: ignore[import-untyped]
 
 
 def train_final_model(

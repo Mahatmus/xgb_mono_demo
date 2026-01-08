@@ -5,7 +5,7 @@ from collections.abc import Callable
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_percentage_error
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor  # type: ignore[import-untyped]
 
 from src.training import CVResult
 
@@ -48,7 +48,7 @@ def run_cv(
         cv_trees.append(model.best_iteration + 1)
 
     return CVResult(
-        cv_mape=np.mean(cv_mapes),
+        cv_mape=float(np.mean(cv_mapes)),
         median_trees=int(np.median(cv_trees)),
         cv_mapes=cv_mapes,
         cv_trees=cv_trees,
