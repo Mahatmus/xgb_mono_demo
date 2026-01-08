@@ -16,5 +16,5 @@
 - [ ] ZZ. Final run
 - [ ] 8. Double check energy efficiency is removed everywhere
 - [ ] 4. Check that datasets are well described (variables match)
-- [ ] 4. Generate final reports + "article" 
+- [ ] 4. Generate final reports + "article"
 - [ ] 7. Linkedin post
