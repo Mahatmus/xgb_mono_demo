@@ -15,22 +15,22 @@ def preprocess_simple(
     output_dir: Path | str = "data_processed",
 ) -> None:
     """
-    Generic preprocessing for datasets that only need train/val/test splits.
+    Generic preprocessing for datasets that only need fold-based splits.
 
     Used for: California Housing, Medical Insurance, Concrete Strength
 
     Args:
         dataset_name: Name for output file
         input_filename: Input CSV filename
-        target_col: Name of the target column for plotting
+        target_col: Name of the target column for plotting and stratification
         input_dir: Directory containing raw data
         output_dir: Directory to save processed data
     """
     input_path = Path(input_dir) / input_filename
     df = pd.read_csv(input_path)
 
-    # Create splits (no stratification for continuous targets)
-    df = create_splits(df, train_size=0.7, val_size=0.2, test_size=0.1, random_state=42)
+    # Create stratified folds (6 folds total, fold 6 = test)
+    df = create_splits(df, n_folds=6, random_state=42, stratify_col=target_col)
 
     # Save processed data
     save_processed_data(df, dataset_name, output_dir)
@@ -50,7 +50,7 @@ def preprocess_auto_mpg(
     1. Extract manufacturer from car_name
     2. Handle missing horsepower values
     3. Drop car_name column
-    4. Create train/val/test splits
+    4. Create stratified fold-based splits
 
     Args:
         input_dir: Directory containing raw data
@@ -60,7 +60,24 @@ def preprocess_auto_mpg(
     df = pd.read_csv(input_path)
 
     # Extract manufacturer from car_name (first word)
-    df["manufacturer"] = df["car_name"].str.split().str[0]
+    df["manufacturer"] = df["car_name"].str.split().str[0].str.lower()
+
+    # Normalize manufacturer names (fix typos and variants)
+    manufacturer_map = {
+        "chevy": "chevrolet",
+        "chevroelt": "chevrolet",
+        "toyouta": "toyota",
+        "vokswagen": "volkswagen",
+        "vw": "volkswagen",
+        "maxda": "mazda",
+        "hi": "bmw",  # "bmw 2002" appears as "hi" in some entries
+    }
+    df["manufacturer"] = df["manufacturer"].replace(manufacturer_map)
+
+    # Group rare manufacturers (< 10 samples) into "other"
+    manufacturer_counts = df["manufacturer"].value_counts()
+    rare_manufacturers = manufacturer_counts[manufacturer_counts < 10].index
+    df.loc[df["manufacturer"].isin(rare_manufacturers), "manufacturer"] = "other"
 
     # Drop car_name
     df = df.drop(columns=["car_name"])
@@ -69,8 +86,8 @@ def preprocess_auto_mpg(
     # Convert to numeric, which will turn '?' into NaN
     df["horsepower"] = pd.to_numeric(df["horsepower"], errors="coerce")
 
-    # Create splits (no stratification needed)
-    df = create_splits(df, train_size=0.7, val_size=0.2, test_size=0.1, random_state=42)
+    # Create stratified folds (6 folds total, fold 6 = test), stratified by manufacturer
+    df = create_splits(df, n_folds=6, random_state=42, stratify_col="manufacturer")
 
     # Save processed data
     save_processed_data(df, "auto_mpg", output_dir)
@@ -90,7 +107,7 @@ def preprocess_ames_housing(
     1. Select variables according to data_descriptions/ames_housing.md
     2. Create ratio features (relative to GrLivArea)
     3. Encode ordinal variables
-    4. Create train/val/test splits
+    4. Create stratified fold-based splits
 
     Args:
         input_dir: Directory containing raw data
@@ -140,8 +157,8 @@ def preprocess_ames_housing(
     final_cols = keep_vars + ratio_cols + unconstrained + ["SalePrice"]
     df = df[final_cols]
 
-    # Create splits (no stratification needed)
-    df = create_splits(df, train_size=0.7, val_size=0.2, test_size=0.1, random_state=42)
+    # Create stratified folds (6 folds total, fold 6 = test)
+    df = create_splits(df, n_folds=6, random_state=42, stratify_col="SalePrice")
 
     # Save processed data
     save_processed_data(df, "ames_housing", output_dir)
@@ -159,7 +176,7 @@ def preprocess_energy_efficiency(
 
     Preprocessing steps:
     1. Exclude Relative Compactness and Wall Area (per data_descriptions/energy_efficiency.md)
-    2. Create train/val/test splits (same splits for both targets)
+    2. Create stratified fold-based splits (same folds for both targets)
     3. Save two separate files: one for Heating Load, one for Cooling Load
 
     Args:
@@ -173,8 +190,8 @@ def preprocess_energy_efficiency(
     exclude_vars = ["Relative Compactness", "Wall Area"]
     df = df.drop(columns=[col for col in exclude_vars if col in df.columns])
 
-    # Create splits once (same splits for both targets)
-    df = create_splits(df, train_size=0.7, val_size=0.2, test_size=0.1, random_state=42)
+    # Create stratified folds using Heating Load for stratification (same folds for both targets)
+    df = create_splits(df, n_folds=6, random_state=42, stratify_col="Heating Load")
 
     # Save two versions - one for each target
     # Version 1: Heating Load as target
@@ -197,7 +214,7 @@ def preprocess_california_housing(
 
     Preprocessing steps:
     1. Remove houses with median_house_value > 500,000 (censored values)
-    2. Create train/val/test splits
+    2. Create stratified fold-based splits
 
     Args:
         input_dir: Directory containing raw data
@@ -209,8 +226,8 @@ def preprocess_california_housing(
     # Remove censored values (houses capped at $500k+)
     df = df[df["median_house_value"] <= 500000]
 
-    # Create splits (no stratification for continuous targets)
-    df = create_splits(df, train_size=0.7, val_size=0.2, test_size=0.1, random_state=42)
+    # Create stratified folds (6 folds total, fold 6 = test)
+    df = create_splits(df, n_folds=6, random_state=42, stratify_col="median_house_value")
 
     # Save processed data
     save_processed_data(df, "california_housing", output_dir)
