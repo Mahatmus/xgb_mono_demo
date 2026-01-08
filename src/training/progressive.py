@@ -14,7 +14,7 @@ features, then incorporate monotonic constraints without losing flexibility.
 import numpy as np
 import pandas as pd
 from sklearn.metrics import mean_absolute_percentage_error
-from xgboost import XGBRegressor
+from xgboost import XGBRegressor  # type: ignore[import-untyped]
 
 from src.training import CVResult
 
@@ -42,9 +42,10 @@ def mask_features_as_constant(df: pd.DataFrame, features: list[str]) -> pd.DataF
         if df_masked[col].dtype.name == "category":
             # Preserve categorical dtype and full categories when setting constant
             cats = df_masked[col].cat.categories
-            df_masked[col] = pd.Categorical.from_codes(
-                [cats.get_loc(first_val)] * len(df_masked), categories=cats
-            )
+            loc = cats.get_loc(first_val)
+            if not isinstance(loc, int):
+                loc = 0  # Fallback if get_loc returns slice/mask
+            df_masked[col] = pd.Categorical.from_codes([loc] * len(df_masked), categories=cats)
         else:
             df_masked[col] = first_val
     return df_masked
@@ -103,7 +104,7 @@ def run_cv_progressive(
         cv_total_trees.append(num_trees_phase1 + model.best_iteration + 1)
 
     return CVResult(
-        cv_mape=np.mean(cv_mapes),
+        cv_mape=float(np.mean(cv_mapes)),
         median_trees=int(np.median(cv_total_trees)),
         cv_mapes=cv_mapes,
         cv_trees=cv_total_trees,

@@ -76,8 +76,8 @@ def preprocess_auto_mpg(
 
     # Group rare manufacturers (< 10 samples) into "other"
     manufacturer_counts = df["manufacturer"].value_counts()
-    rare_manufacturers = manufacturer_counts[manufacturer_counts < 10].index
-    df.loc[df["manufacturer"].isin(rare_manufacturers), "manufacturer"] = "other"
+    rare_manufacturers = manufacturer_counts[manufacturer_counts < 10].index  # type: ignore[union-attr]
+    df.loc[df["manufacturer"].isin(rare_manufacturers.tolist()), "manufacturer"] = "other"
 
     # Drop car_name
     df = df.drop(columns=["car_name"])
@@ -146,11 +146,11 @@ def preprocess_ames_housing(
 
     # Apply ordinal encoding
     if "ExterQual" in df.columns:
-        df["ExterQual"] = df["ExterQual"].map(quality_map)
+        df["ExterQual"] = df["ExterQual"].map(quality_map)  # type: ignore[arg-type]
     if "KitchenQual" in df.columns:
-        df["KitchenQual"] = df["KitchenQual"].map(quality_map)
+        df["KitchenQual"] = df["KitchenQual"].map(quality_map)  # type: ignore[arg-type]
     if "BsmtQual" in df.columns:
-        df["BsmtQual"] = df["BsmtQual"].fillna("NA").map(bsmt_qual_map)
+        df["BsmtQual"] = df["BsmtQual"].fillna("NA").map(bsmt_qual_map)  # type: ignore[arg-type]
 
     # Select final columns
     ratio_cols = [f"{var}_ratio" for var in ratio_vars if var in df.columns]
@@ -158,7 +158,7 @@ def preprocess_ames_housing(
     df = df[final_cols]
 
     # Create stratified folds (6 folds total, fold 6 = test)
-    df = create_splits(df, n_folds=6, random_state=42, stratify_col="SalePrice")
+    df = create_splits(df, n_folds=6, random_state=42, stratify_col="SalePrice")  # type: ignore[arg-type]
 
     # Save processed data
     save_processed_data(df, "ames_housing", output_dir)
@@ -189,7 +189,7 @@ def preprocess_california_housing(
     df = df[df["median_house_value"] <= 500000]
 
     # Create stratified folds (6 folds total, fold 6 = test)
-    df = create_splits(df, n_folds=6, random_state=42, stratify_col="median_house_value")
+    df = create_splits(df, n_folds=6, random_state=42, stratify_col="median_house_value")  # type: ignore[arg-type]
 
     # Save processed data
     save_processed_data(df, "california_housing", output_dir)
