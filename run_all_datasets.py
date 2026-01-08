@@ -31,6 +31,7 @@ def load_config(config_path: str) -> list[dict]:
                 "target": row["target"],
                 "monotonic": row.get("monotonic", ""),
                 "objective": row.get("objective", "count:poisson"),
+                "lr": float(row.get("lr", 0.1)),
             })
     return datasets
 
@@ -39,7 +40,6 @@ def run_all(
     config_path: str,
     output_dir: str = "results",
     max_depths: list[int] | None = None,
-    learning_rate: float = 0.1,
 ):
     """Run grid search on all datasets in config."""
     if max_depths is None:
@@ -68,7 +68,7 @@ def run_all(
                 target_col=ds["target"],
                 monotonic_constraints=mono_constraints,
                 max_depths=max_depths,
-                learning_rate=learning_rate,
+                learning_rate=ds["lr"],
                 objective=ds["objective"],
                 output_dir=output_dir,
             )
@@ -126,7 +126,6 @@ if __name__ == "__main__":
                         help="Output directory for results")
     parser.add_argument("--depths", type=int, nargs="*", default=list(range(1, 11)),
                         help="Max depths to try (default: 1-10)")
-    parser.add_argument("--lr", type=float, default=0.1, help="Learning rate")
 
     args = parser.parse_args()
 
@@ -134,5 +133,4 @@ if __name__ == "__main__":
         config_path=args.config,
         output_dir=args.output_dir,
         max_depths=args.depths,
-        learning_rate=args.lr,
     )

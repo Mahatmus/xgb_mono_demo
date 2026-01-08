@@ -670,7 +670,7 @@ def run_grid_search(
 
     for pct in percentages:
         start = time.time()
-        num_trees_phase1 = max(10, int(best_mono.n_trees * pct))
+        num_trees_phase1 = max(5, int(best_mono.n_trees * pct))
 
         cv_result = run_cv_progressive(
             X_train_val, y_train_val, cv_splits, params, monotonic_features, num_trees_phase1
