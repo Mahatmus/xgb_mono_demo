@@ -4,7 +4,7 @@ from pathlib import Path
 
 import pandas as pd
 
-from preprocessing.common import create_splits, plot_target_distribution, save_processed_data
+from src.preprocessing.common import create_splits, plot_target_distribution, save_processed_data
 
 
 def preprocess_simple(
@@ -196,18 +196,3 @@ def preprocess_california_housing(
 
     # Plot target distribution
     plot_target_distribution(df, "median_house_value", "california_housing", output_dir)
-
-
-if __name__ == "__main__":
-    # Simple datasets (no variable transformations needed)
-    preprocess_california_housing()
-    preprocess_simple("medical_insurance", "insurance.csv", "charges")
-    preprocess_simple(
-        "concrete_strength",
-        "concrete_strength.csv",
-        "Concrete compressive strength(MPa, megapascals) ",
-    )
-
-    # Datasets with variable transformations
-    preprocess_auto_mpg()
-    preprocess_ames_housing()

@@ -1,3 +1,4 @@
+#!/usr/bin/env python3
 """
 Download datasets for XGBoost monotonic constraints demonstration.
 
@@ -16,21 +17,28 @@ import pandas as pd
 import requests
 from dotenv import load_dotenv
 
+from src import setup_logging
+
+# Configure logging
+logger = setup_logging()
+
 # Load environment variables BEFORE importing Kaggle API
 load_dotenv()
 
 # Set KAGGLE_KEY from KAGGLE_API_TOKEN if available
 if "KAGGLE_API_TOKEN" in os.environ and "KAGGLE_KEY" not in os.environ:
     os.environ["KAGGLE_KEY"] = os.environ["KAGGLE_API_TOKEN"]
-    os.environ["KAGGLE_USERNAME"] = ""  # Not needed with API token
+    os.environ["KAGGLE_USERNAME"] = "unused"  # Placeholder - not validated with new tokens
 
 # NOW import Kaggle API after environment is configured
-from kaggle.api.kaggle_api_extended import KaggleApi  # noqa: E402
+# Note: kaggle module auto-authenticates on import and deletes KAGGLE_API_TOKEN
+# So we use the pre-authenticated global api instance
+import kaggle  # noqa: E402
 
 
-def download_california_housing(api: KaggleApi) -> None:
+def download_california_housing(api: kaggle.KaggleApi) -> None:
     """Download California Housing dataset from Kaggle."""
-    print("Downloading California Housing...")
+    logger.info("Downloading California Housing...")
     api.dataset_download_files("camnugent/california-housing-prices", path="data", unzip=True)
     housing_path = Path("data/housing.csv")
     if housing_path.exists():
@@ -39,7 +47,7 @@ def download_california_housing(api: KaggleApi) -> None:
 
 def download_auto_mpg() -> None:
     """Download Auto MPG dataset from UCI."""
-    print("Downloading Auto MPG...")
+    logger.info("Downloading Auto MPG...")
     url = "https://archive.ics.uci.edu/static/public/9/auto+mpg.zip"
     r = requests.get(url)
     zip_path = Path("data/auto_mpg.zip")
@@ -66,15 +74,15 @@ def download_auto_mpg() -> None:
     shutil.rmtree("data/auto_mpg_tmp")
 
 
-def download_insurance(api: KaggleApi) -> None:
+def download_insurance(api: kaggle.KaggleApi) -> None:
     """Download Medical Insurance dataset from Kaggle."""
-    print("Downloading Medical Insurance...")
+    logger.info("Downloading Medical Insurance...")
     api.dataset_download_files("mirichoi0218/insurance", path="data", unzip=True)
 
 
 def download_concrete() -> None:
     """Download Concrete Strength dataset from UCI."""
-    print("Downloading Concrete Strength...")
+    logger.info("Downloading Concrete Strength...")
     url = "https://archive.ics.uci.edu/static/public/165/concrete+compressive+strength.zip"
     r = requests.get(url)
     zip_path = Path("data/concrete.zip")
@@ -87,9 +95,9 @@ def download_concrete() -> None:
     shutil.rmtree("data/concrete_tmp")
 
 
-def download_ames(api: KaggleApi) -> None:
+def download_ames(api: kaggle.KaggleApi) -> None:
     """Download Ames Housing dataset from Kaggle Competition."""
-    print("Downloading Ames Housing...")
+    logger.info("Downloading Ames Housing...")
     try:
         api.competition_download_files("house-prices-advanced-regression-techniques", path="data")
         zip_path = Path("data/house-prices-advanced-regression-techniques.zip")
@@ -103,16 +111,18 @@ def download_ames(api: KaggleApi) -> None:
             if file_path.exists():
                 file_path.unlink()
     except Exception as e:
-        print(f"Failed to download Ames Housing: {e}")
-        print("Note: You must accept competition rules at:")
-        print("https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques")
+        logger.error("Failed to download Ames Housing: %s", e)
+        logger.info("Note: You must accept competition rules at:")
+        logger.info(
+            "https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques"
+        )
 
 
 if __name__ == "__main__":
     # Initialize
     Path("data").mkdir(exist_ok=True)
-    api = KaggleApi()
-    api.authenticate()
+    # Use pre-authenticated global api (authenticated during import)
+    api = kaggle.api
 
     # Download all datasets
     download_california_housing(api)
@@ -121,4 +131,4 @@ if __name__ == "__main__":
     download_concrete()
     download_ames(api)
 
-    print("\nAll datasets downloaded to data/ directory")
+    logger.info("All datasets downloaded to data/ directory")

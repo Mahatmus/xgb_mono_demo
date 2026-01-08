@@ -1,8 +1,9 @@
 #Claude
 .CLAUDE.md
 
-# Data files
+# Data files (but not config)
 *.csv
+!config/*.csv
 *.png
 data/*.zip
 data/*_tmp/

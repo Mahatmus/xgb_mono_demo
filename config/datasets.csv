@@ -1,0 +1,6 @@
+dataset,target,monotonic,objective,lr
+data_processed/ames_housing.csv,SalePrice,GrLivArea:+1;LotArea:+1,count:poisson,0.1
+data_processed/california_housing.csv,median_house_value,median_income:+1,count:poisson,0.1
+data_processed/auto_mpg.csv,mpg,weight:-1,count:poisson,0.1
+data_processed/concrete_strength.csv,"Concrete compressive strength(MPa, megapascals) ",Age (day):+1,count:poisson,0.1
+data_processed/medical_insurance.csv,charges,age:+1,reg:gamma,0.02

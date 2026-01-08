@@ -1,46 +1,47 @@
+#!/usr/bin/env python3
 """
-Meta script to run tune_simple_grid.py on all datasets from a config file.
+Run grid search experiments on all datasets.
+
+This script runs the progressive training experiments across all datasets
+defined in config/datasets.csv.
 """
 
 import argparse
 import csv
-import logging
 import time
 from pathlib import Path
 
 import pandas as pd
 
-from tune_simple_grid import parse_monotonic_constraints, run_grid_search
+from src import setup_logging
+from src.grid_search import run_grid_search
+from src.utils import parse_monotonic_constraints
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="%(asctime)s | %(message)s",
-    datefmt="%H:%M:%S",
-)
-logger = logging.getLogger(__name__)
+# Configure logging
+logger = setup_logging()
 
 
 def load_config(config_path: str) -> list[dict]:
     """Load dataset config from CSV file."""
-    datasets = []
-    with open(config_path, newline="") as f:
+    with Path(config_path).open(newline="") as f:
         reader = csv.DictReader(f)
-        for row in reader:
-            datasets.append({
+        return [
+            {
                 "dataset": row["dataset"],
                 "target": row["target"],
                 "monotonic": row.get("monotonic", ""),
                 "objective": row.get("objective", "count:poisson"),
                 "lr": float(row.get("lr", 0.1)),
-            })
-    return datasets
+            }
+            for row in reader
+        ]
 
 
 def run_all(
     config_path: str,
     output_dir: str = "results",
     max_depths: list[int] | None = None,
-):
+) -> None:
     """Run grid search on all datasets in config."""
     if max_depths is None:
         max_depths = list(range(1, 11))
@@ -73,20 +74,24 @@ def run_all(
                 output_dir=output_dir,
             )
             elapsed = time.time() - start
-            results_summary.append({
-                "dataset": dataset_name,
-                "status": "success",
-                "time": f"{elapsed:.1f}s",
-            })
+            results_summary.append(
+                {
+                    "dataset": dataset_name,
+                    "status": "success",
+                    "time": f"{elapsed:.1f}s",
+                }
+            )
             logger.info("Completed %s in %.1fs", dataset_name, elapsed)
 
         except Exception as e:
             logger.error("Failed %s: %s", dataset_name, str(e))
-            results_summary.append({
-                "dataset": dataset_name,
-                "status": "failed",
-                "error": str(e),
-            })
+            results_summary.append(
+                {
+                    "dataset": dataset_name,
+                    "status": "failed",
+                    "error": str(e),
+                }
+            )
 
     total_elapsed = time.time() - total_start
     logger.info("=" * 70)
@@ -108,7 +113,7 @@ def run_all(
         grid_file = output_path / dataset_name / "grid_results.csv"
         if grid_file.exists():
             df = pd.read_csv(grid_file)
-            chosen = df[df["chosen"] == True]
+            chosen = df[df["chosen"]]  # Fixed: removed == True
             all_chosen.append(chosen)
 
     if all_chosen:
@@ -120,12 +125,25 @@ def run_all(
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Run grid search on all datasets")
-    parser.add_argument("--config", type=str, default="datasets_config.csv",
-                        help="Path to config CSV file")
-    parser.add_argument("--output-dir", type=str, default="results",
-                        help="Output directory for results")
-    parser.add_argument("--depths", type=int, nargs="*", default=list(range(1, 11)),
-                        help="Max depths to try (default: 1-10)")
+    parser.add_argument(
+        "--config",
+        type=str,
+        default="config/datasets.csv",
+        help="Path to config CSV file",
+    )
+    parser.add_argument(
+        "--output-dir",
+        type=str,
+        default="results",
+        help="Output directory for results",
+    )
+    parser.add_argument(
+        "--depths",
+        type=int,
+        nargs="*",
+        default=list(range(1, 11)),
+        help="Max depths to try (default: 1-10)",
+    )
 
     args = parser.parse_args()
 
