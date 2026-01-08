@@ -38,16 +38,16 @@ def load_and_prepare_data(
     test_df = df[df["fold"] == "test"].copy()
     train_val_df["fold"] = train_val_df["fold"].astype(int)
 
-    X_train_val = train_val_df[feature_cols]
-    y_train_val = train_val_df[target_col].to_numpy()
-    folds = train_val_df["fold"].values
+    X_train_val = train_val_df[feature_cols]  # type: ignore[assignment]
+    y_train_val = train_val_df[target_col].to_numpy()  # type: ignore[union-attr]
+    folds = train_val_df["fold"].values  # type: ignore[union-attr]
 
-    X_test = test_df[feature_cols]
-    y_test = test_df[target_col].to_numpy()
+    X_test = test_df[feature_cols]  # type: ignore[assignment]
+    y_test = test_df[target_col].to_numpy()  # type: ignore[union-attr]
 
     # Build CV splits
     cv_splits = []
-    for fold_id in sorted(train_val_df["fold"].unique()):
+    for fold_id in sorted(train_val_df["fold"].unique()):  # type: ignore[union-attr]
         train_idx = np.where(folds != fold_id)[0]
         val_idx = np.where(folds == fold_id)[0]
         cv_splits.append((train_idx, val_idx))
@@ -60,4 +60,4 @@ def load_and_prepare_data(
         len(feature_cols),
     )
 
-    return X_train_val, y_train_val, X_test, y_test, cv_splits, feature_cols
+    return X_train_val, y_train_val, X_test, y_test, cv_splits, feature_cols  # type: ignore[return-value]
