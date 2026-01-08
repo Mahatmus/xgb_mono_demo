@@ -7,8 +7,10 @@
 - [*] 1.5. Check distributions for targets
 - [*] 2. Set up script to train xgboost, with minimal hyperparameter tuning, with and without mono constraints
 - [*] 3. Implement the mono trick
+- [*] 9. Add "Also exclude" for california
+- [ ] 8. Double check energy efficiency is removed everywhere
 - [ ] 3.5 Training curves from val model on 1st fold?
-- [ ] 3.6 Default depths to 1-10
+- [*] 3.6 Default depths to 1-10
 - [ ] 4. Generate final reports
 - [ ] 5. Do a cleanup - good readme, split of files scripts, etc.
 - [ ] 6. Create final report for readme.md

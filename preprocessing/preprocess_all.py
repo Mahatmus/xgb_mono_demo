@@ -167,44 +167,6 @@ def preprocess_ames_housing(
     plot_target_distribution(df, "SalePrice", "ames_housing", output_dir)
 
 
-def preprocess_energy_efficiency(
-    input_dir: Path | str = "data",
-    output_dir: Path | str = "data_processed",
-) -> None:
-    """
-    Preprocess Energy Efficiency dataset.
-
-    Preprocessing steps:
-    1. Exclude Relative Compactness and Wall Area (per data_descriptions/energy_efficiency.md)
-    2. Create stratified fold-based splits (same folds for both targets)
-    3. Save two separate files: one for Heating Load, one for Cooling Load
-
-    Args:
-        input_dir: Directory containing raw data
-        output_dir: Directory to save processed data
-    """
-    input_path = Path(input_dir) / "energy_efficiency.csv"
-    df = pd.read_csv(input_path)
-
-    # Exclude variables per specification
-    exclude_vars = ["Relative Compactness", "Wall Area"]
-    df = df.drop(columns=[col for col in exclude_vars if col in df.columns])
-
-    # Create stratified folds using Heating Load for stratification (same folds for both targets)
-    df = create_splits(df, n_folds=6, random_state=42, stratify_col="Heating Load")
-
-    # Save two versions - one for each target
-    # Version 1: Heating Load as target
-    heating_df = df.drop(columns=["Cooling Load"])
-    save_processed_data(heating_df, "energy_efficiency_heating", output_dir)
-    plot_target_distribution(heating_df, "Heating Load", "energy_efficiency_heating", output_dir)
-
-    # Version 2: Cooling Load as target
-    cooling_df = df.drop(columns=["Heating Load"])
-    save_processed_data(cooling_df, "energy_efficiency_cooling", output_dir)
-    plot_target_distribution(cooling_df, "Cooling Load", "energy_efficiency_cooling", output_dir)
-
-
 def preprocess_california_housing(
     input_dir: Path | str = "data",
     output_dir: Path | str = "data_processed",
@@ -249,4 +211,3 @@ if __name__ == "__main__":
     # Datasets with variable transformations
     preprocess_auto_mpg()
     preprocess_ames_housing()
-    preprocess_energy_efficiency()

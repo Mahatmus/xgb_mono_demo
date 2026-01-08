@@ -108,36 +108,6 @@ def download_ames(api: KaggleApi) -> None:
         print("https://www.kaggle.com/competitions/house-prices-advanced-regression-techniques")
 
 
-def download_energy() -> None:
-    """Download Energy Efficiency dataset from UCI."""
-    print("Downloading Energy Efficiency...")
-    url = "https://archive.ics.uci.edu/static/public/242/energy+efficiency.zip"
-    r = requests.get(url)
-    zip_path = Path("data/energy.zip")
-    zip_path.write_bytes(r.content)
-    with zipfile.ZipFile(zip_path, "r") as z:
-        z.extractall("data/energy_tmp")
-    df = pd.read_excel("data/energy_tmp/ENB2012_data.xlsx")
-
-    # Rename columns from X1-X8, Y1-Y2 to descriptive names
-    df.columns = [
-        "Relative Compactness",
-        "Surface Area",
-        "Wall Area",
-        "Roof Area",
-        "Overall Height",
-        "Orientation",
-        "Glazing Area",
-        "Glazing Area Distribution",
-        "Heating Load",
-        "Cooling Load",
-    ]
-
-    df.to_csv("data/energy_efficiency.csv", index=False)
-    zip_path.unlink()
-    shutil.rmtree("data/energy_tmp")
-
-
 if __name__ == "__main__":
     # Initialize
     Path("data").mkdir(exist_ok=True)
@@ -150,6 +120,5 @@ if __name__ == "__main__":
     download_insurance(api)
     download_concrete()
     download_ames(api)
-    download_energy()
 
     print("\nAll datasets downloaded to data/ directory")

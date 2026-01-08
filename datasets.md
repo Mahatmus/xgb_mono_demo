@@ -1,5 +1,5 @@
 Regression datasets for XGBoost monotonic constraints
-Finding the right datasets to demonstrate monotonic constraint techniques requires identifying regression problems where predictor-target relationships follow clear, intuitive directional patterns. Seven datasets stand out across housing, insurance, automotive, gemology, and engineering domains—each offering strong candidates for monotonic constraints with documented relationships that any practitioner can understand.
+Finding the right datasets to demonstrate monotonic constraint techniques requires identifying regression problems where predictor-target relationships follow clear, intuitive directional patterns. Six datasets stand out across housing, insurance, automotive, gemology, and engineering domains—each offering strong candidates for monotonic constraints with documented relationships that any practitioner can understand.
 California Housing offers the cleanest demonstration
 The California Housing dataset from scikit-learn provides 20,640 samples with 8 features scikit-learn predicting median house values. The MedInc (median income) feature has a correlation of ~0.69 with house price—the strongest predictor and an obvious candidate for positive monotonic constraint. Higher neighborhood income should always predict higher prices.
 Source: Built into scikit-learn (sklearn.datasets.fetch_california_housing)
@@ -49,16 +49,5 @@ Source: https://www.kaggle.com/c/house-prices-advanced-regression-techniques
 Key monotonic variables:
 VariableDirectionRationaleGrLivArea+1Larger living area increases valueTotalBsmtSF+1More basement space adds utilityOverallQual+11-10 quality rating directly impacts priceGarageCars+1More garage capacity is desirableFullBath+1Additional bathrooms add valueYearBuilt+1Newer construction commands premiumsFireplaces+1Amenity that adds value
 The 79 features include 36 numerical variables, many with clear monotonic expectations. github This enables demonstrating constraint selection—deciding which features warrant constraints versus those with ambiguous relationships.
-Energy Efficiency offers two targets
-The UCI Energy Efficiency dataset (768 rows, 8 features) uniquely provides two regression targets (heating and cooling load) uciUCI Machine Learning Repository allowing demonstrations of different constraint configurations.
-Source: https://archive.ics.uci.edu/dataset/242/energy+efficiency
-Key monotonic variables for heating load:
-
-Surface Area (+1): GitHub More exterior surface = more heat loss (Q = U × A × ΔT)
-Wall Area (+1): GitHub Walls are primary heat loss surfaces
-Glazing Area (+1): GitHub Windows have higher thermal transmittance than insulated walls
-Relative Compactness (-1): GitHub More compact buildings lose less heat per unit volume
-
-Building physics provides clear thermodynamic justifications for each constraint. The dual-target structure allows showing how the same predictors might have different constraint configurations for different objectives.
 Quick reference for implementation
-DatasetSourceRowsFeaturesBest Monotonic VariablesConstraint DirectionsCalifornia Housingsklearn20,6408MedInc, AveRoomsBoth positiveAuto MPGUCI3987weight, displacement, model_yearMostly negativeMedical InsuranceKaggle1,3387age, bmi, smokerAll positiveConcrete StrengthUCI1,0308Age, CementBoth positiveAmes HousingKaggle2,93079GrLivArea, OverallQual, YearBuiltAll positiveEnergy EfficiencyUCI7688Surface Area, CompactnessMixed (+/-)
+DatasetSourceRowsFeaturesBest Monotonic VariablesConstraint DirectionsCalifornia Housingsklearn20,6408MedInc, AveRoomsBoth positiveAuto MPGUCI3987weight, displacement, model_yearMostly negativeMedical InsuranceKaggle1,3387age, bmi, smokerAll positiveConcrete StrengthUCI1,0308Age, CementBoth positiveAmes HousingKaggle2,93079GrLivArea, OverallQual, YearBuiltAll positive

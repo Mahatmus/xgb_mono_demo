@@ -29,43 +29,6 @@ logging.basicConfig(
 logger = logging.getLogger(__name__)
 
 
-def plot_learning_curves(
-    evals_result: dict,
-    title: str,
-    output_path: Path,
-    phase1_trees: int | None = None,
-):
-    """Plot train/validation learning curves."""
-    fig, ax = plt.subplots(figsize=(10, 6))
-
-    # Auto-detect metric from evals_result
-    train_data = evals_result.get("validation_0", {})
-    val_data = evals_result.get("validation_1", {})
-    metric = list(train_data.keys())[0] if train_data else "metric"
-
-    train_metric = train_data.get(metric, [])
-    val_metric = val_data.get(metric, [])
-
-    if train_metric:
-        ax.plot(train_metric, label="Train", alpha=0.8)
-    if val_metric:
-        ax.plot(val_metric, label="Validation", alpha=0.8)
-
-    if phase1_trees is not None:
-        ax.axvline(x=phase1_trees, color="red", linestyle="--", alpha=0.7, label="Phase 1 → 2")
-
-    ax.set_xlabel("Boosting Round")
-    ax.set_ylabel(metric)
-    ax.set_title(f"Learning Curves: {title}")
-    ax.legend()
-    ax.grid(True, alpha=0.3)
-
-    plt.tight_layout()
-    plt.savefig(output_path, dpi=150)
-    plt.close()
-    logger.info("Saved learning curves: %s", output_path)
-
-
 def plot_feature_importance(
     model: XGBRegressor,
     feature_names: list,
@@ -233,13 +196,11 @@ def get_feature_importance_dict(
 
 def generate_diagnostics(
     model: XGBRegressor,
-    evals_result: dict,
     X_test: pd.DataFrame,
     feature_names: list,
     monotonic_features: list,
     approach: str,
     diagnostics_dir: Path,
-    phase1_trees: int | None = None,
 ) -> dict[str, float]:
     """
     Generate all diagnostic plots for a model.
@@ -248,14 +209,6 @@ def generate_diagnostics(
         Feature importance dict (normalized to 100%)
     """
     diagnostics_dir.mkdir(parents=True, exist_ok=True)
-
-    # Learning curves
-    plot_learning_curves(
-        evals_result,
-        title=approach,
-        output_path=diagnostics_dir / f"{approach}_learning_curves.png",
-        phase1_trees=phase1_trees,
-    )
 
     # Feature importance (plot + return dict)
     plot_feature_importance(
@@ -404,39 +357,22 @@ def train_final_model(
     return model, test_mape
 
 
-def train_final_model_with_eval(
-    X_train: pd.DataFrame,
-    y_train: np.ndarray,
-    X_test: pd.DataFrame,
-    y_test: np.ndarray,
-    params: dict,
-    n_estimators: int,
-    xgb_model=None,
-) -> tuple[XGBRegressor, float, dict]:
-    """
-    Train final model with eval tracking for diagnostics.
-
-    Returns:
-        Tuple of (trained model, test MAPE, evals_result)
-    """
-    final_params = {k: v for k, v in params.items() if k != "early_stopping_rounds"}
-    final_params["n_estimators"] = n_estimators
-
-    evals_result = {}
-    model = XGBRegressor(**final_params)
-    model.fit(
-        X_train,
-        y_train,
-        eval_set=[(X_train, y_train), (X_test, y_test)],
-        xgb_model=xgb_model,
-        verbose=False,
-    )
-    evals_result = model.evals_result()
-
-    test_preds = model.predict(X_test)
-    test_mape = mean_absolute_percentage_error(y_test, test_preds)
-
-    return model, test_mape, evals_result
+def mask_features_as_constant(df: pd.DataFrame, features: list) -> pd.DataFrame:
+    """Mask specified features as constant (first row value), preventing model from using them."""
+    df_masked = df.copy()
+    for col in features:
+        if col not in df_masked.columns:
+            continue
+        first_val = df_masked[col].iloc[0]
+        if df_masked[col].dtype.name == "category":
+            # Preserve categorical dtype and full categories when setting constant
+            cats = df_masked[col].cat.categories
+            df_masked[col] = pd.Categorical.from_codes(
+                [cats.get_loc(first_val)] * len(df_masked), categories=cats
+            )
+        else:
+            df_masked[col] = first_val
+    return df_masked
 
 
 def run_cv_progressive(
@@ -472,10 +408,7 @@ def run_cv_progressive(
         y_tr, y_val = y[train_idx], y[val_idx]
 
         # Phase 1: Train with monotonic features as NA
-        X_tr_phase1 = X_tr.copy()
-        for col in monotonic_features:
-            X_tr_phase1[col] = X_tr_phase1[col].astype(float)
-        X_tr_phase1.loc[:, monotonic_features] = np.nan
+        X_tr_phase1 = mask_features_as_constant(X_tr, monotonic_features)
 
         model_phase1 = XGBRegressor(**params_phase1)
         model_phase1.fit(X_tr_phase1, y_tr, verbose=False)
@@ -532,10 +465,7 @@ def train_final_progressive(
     params_phase1["n_estimators"] = num_trees_phase1
 
     # Phase 1
-    X_train_phase1 = X_train.copy()
-    for col in monotonic_features:
-        X_train_phase1[col] = X_train_phase1[col].astype(float)
-    X_train_phase1.loc[:, monotonic_features] = np.nan
+    X_train_phase1 = mask_features_as_constant(X_train, monotonic_features)
 
     model_phase1 = XGBRegressor(**params_phase1)
     model_phase1.fit(X_train_phase1, y_train, verbose=False)
@@ -551,70 +481,6 @@ def train_final_progressive(
     test_mape = mean_absolute_percentage_error(y_test, test_preds)
 
     return model, test_mape
-
-
-def train_final_progressive_with_eval(
-    X_train: pd.DataFrame,
-    y_train: np.ndarray,
-    X_test: pd.DataFrame,
-    y_test: np.ndarray,
-    params: dict,
-    monotonic_features: list,
-    num_trees_phase1: int,
-    total_trees: int,
-) -> tuple[XGBRegressor, float, dict]:
-    """
-    Train final progressive model with eval tracking for diagnostics.
-
-    Returns:
-        Tuple of (trained model, test MAPE, evals_result with both phases)
-    """
-    params_phase1 = {k: v for k, v in params.items() if k != "early_stopping_rounds"}
-    params_phase1["n_estimators"] = num_trees_phase1
-
-    # Phase 1 with eval tracking
-    X_train_phase1 = X_train.copy()
-    X_test_phase1 = X_test.copy()
-    for col in monotonic_features:
-        X_train_phase1[col] = X_train_phase1[col].astype(float)
-        X_test_phase1[col] = X_test_phase1[col].astype(float)
-    X_train_phase1.loc[:, monotonic_features] = np.nan
-    X_test_phase1.loc[:, monotonic_features] = np.nan
-
-    model_phase1 = XGBRegressor(**params_phase1)
-    model_phase1.fit(
-        X_train_phase1,
-        y_train,
-        eval_set=[(X_train_phase1, y_train), (X_test_phase1, y_test)],
-        verbose=False,
-    )
-    evals_phase1 = model_phase1.evals_result()
-
-    # Phase 2 with eval tracking
-    params_phase2 = {k: v for k, v in params.items() if k != "early_stopping_rounds"}
-    params_phase2["n_estimators"] = total_trees - num_trees_phase1
-
-    model = XGBRegressor(**params_phase2)
-    model.fit(
-        X_train,
-        y_train,
-        eval_set=[(X_train, y_train), (X_test, y_test)],
-        xgb_model=model_phase1.get_booster(),
-        verbose=False,
-    )
-    evals_phase2 = model.evals_result()
-
-    # Concatenate eval results from both phases
-    evals_result = {}
-    for key in evals_phase1:
-        evals_result[key] = {}
-        for metric in evals_phase1[key]:
-            evals_result[key][metric] = evals_phase1[key][metric] + evals_phase2[key][metric]
-
-    test_preds = model.predict(X_test)
-    test_mape = mean_absolute_percentage_error(y_test, test_preds)
-
-    return model, test_mape, evals_result
 
 
 def load_and_prepare_data(dataset_path: str, target_col: str):
@@ -884,36 +750,35 @@ def run_grid_search(
     # Best baseline model
     logger.info("Training best baseline for diagnostics...")
     baseline_params = {**base_params, "max_depth": best_baseline.max_depth}
-    model_baseline, _, evals_baseline = train_final_model_with_eval(
+    model_baseline, _ = train_final_model(
         X_train_val, y_train_val, X_test, y_test, baseline_params, best_baseline.n_trees
     )
     all_importances["baseline"] = generate_diagnostics(
-        model_baseline, evals_baseline, X_test, feature_cols, monotonic_features,
+        model_baseline, X_test, feature_cols, monotonic_features,
         "baseline", diagnostics_dir
     )
 
     # Best monotonic model
     logger.info("Training best monotonic for diagnostics...")
     monotonic_params = {**base_params, "max_depth": best_mono.max_depth, "monotone_constraints": mono_constraint_tuple}
-    model_monotonic, _, evals_monotonic = train_final_model_with_eval(
+    model_monotonic, _ = train_final_model(
         X_train_val, y_train_val, X_test, y_test, monotonic_params, best_mono.n_trees
     )
     all_importances["monotonic"] = generate_diagnostics(
-        model_monotonic, evals_monotonic, X_test, feature_cols, monotonic_features,
+        model_monotonic, X_test, feature_cols, monotonic_features,
         "monotonic", diagnostics_dir
     )
 
     # Best progressive model
     logger.info("Training best progressive for diagnostics...")
     progressive_params = {**base_params, "max_depth": best_progressive.max_depth, "monotone_constraints": mono_constraint_tuple}
-    model_progressive, _, evals_progressive = train_final_progressive_with_eval(
+    model_progressive, _ = train_final_progressive(
         X_train_val, y_train_val, X_test, y_test, progressive_params,
         monotonic_features, best_progressive.num_trees_phase1, best_progressive.n_trees
     )
     all_importances["progressive"] = generate_diagnostics(
-        model_progressive, evals_progressive, X_test, feature_cols, monotonic_features,
-        "progressive", diagnostics_dir,
-        phase1_trees=best_progressive.num_trees_phase1,
+        model_progressive, X_test, feature_cols, monotonic_features,
+        "progressive", diagnostics_dir
     )
 
     # Save feature importances to CSV (features in rows)

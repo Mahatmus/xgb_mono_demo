@@ -1,6 +1,6 @@
 # XGBoost Monotonic Constraints Demonstration
 
-Demonstrating monotonic constraint techniques in XGBoost using 7 curated regression datasets.
+Demonstrating monotonic constraint techniques in XGBoost using 6 curated regression datasets.
 
 ## Dataset Setup
 
@@ -40,14 +40,13 @@ Or if using uv's managed environment:
 uv run data_init.py
 ```
 
-This creates a `data/` directory with 7 CSV files:
+This creates a `data/` directory with 6 CSV files:
 - `california_housing.csv` (20,640 rows, 8 features)
 - `diamonds.csv` (53,940 rows, 10 features)
 - `auto_mpg.csv` (398 rows, 7 features)
 - `insurance.csv` (1,338 rows, 7 features)
 - `concrete_strength.csv` (1,030 rows, 8 features)
 - `ames_housing.csv` (2,930 rows, 79 features)
-- `energy_efficiency.csv` (768 rows, 8 features)
 
 ## Datasets Overview
 
