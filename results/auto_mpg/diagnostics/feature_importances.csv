@@ -1,0 +1,9 @@
+feature,baseline,monotonic,progressive
+cylinders,69.55,65.28,59.64
+displacement,7.77,8.53,11.20
+horsepower,5.47,5.04,7.66
+weight,8.71,11.73,8.87
+acceleration,0.92,1.07,0.98
+model_year,5.19,5.73,4.85
+origin,0.92,1.16,5.14
+manufacturer,1.47,1.48,1.65

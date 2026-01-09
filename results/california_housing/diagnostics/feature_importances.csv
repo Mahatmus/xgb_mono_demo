@@ -1,0 +1,10 @@
+feature,baseline,monotonic,progressive
+longitude,3.74,2.19,3.80
+latitude,4.93,3.37,5.64
+housing_median_age,2.12,1.33,1.72
+total_rooms,2.18,1.24,3.65
+total_bedrooms,2.12,1.28,2.28
+population,2.73,1.61,3.30
+households,2.14,1.32,2.38
+median_income,21.39,28.19,5.77
+ocean_proximity,58.66,59.48,71.46
