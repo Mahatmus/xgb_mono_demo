@@ -63,11 +63,11 @@ Test set MAPE (Mean Absolute Percentage Error) across 5 regression datasets. Low
 
 | Dataset | Baseline | Monotonic | Warm-Up | n_warmup* | Δ vs Mono | Δ vs Baseline | Notes |
 |---------|----------|-----------|---------|-----------|-----------|---------------|-------|
-| California Housing | 15.56% | 15.97% | **15.11%** | 12.5% | -0.86% | -0.45% | See [Bias Tradeoff](#california-housing-bias-tradeoff) |
-| Ames Housing | 10.53% | 10.24% | **10.06%** | 2.5% | -0.18% | -0.47% | |
-| Auto MPG | 8.50% | 8.54% | **8.25%** | 7.5% | -0.29% | -0.25% | |
-| Concrete Strength | **8.17%** | 8.85% | 8.65% | 2.5% | -0.21% | +0.48% | See [Limitations](#concrete-limitations-with-dominant-features) |
-| Medical Insurance | 26.99% | 27.45% | **26.42%** | 2.5% | -1.03% | -0.57% | |
+| [California Housing](docs/datasets/california_housing.md) | 15.56% | 15.97% | **15.11%** | 12.5% | -0.86% | -0.45% | See [Bias Tradeoff](#california-housing-bias-tradeoff) |
+| [Ames Housing](docs/datasets/ames_housing.md) | 10.53% | 10.24% | **10.06%** | 2.5% | -0.18% | -0.47% | |
+| [Auto MPG](docs/datasets/auto_mpg.md) | 8.50% | 8.54% | **8.25%** | 7.5% | -0.29% | -0.25% | |
+| [Concrete Strength](docs/datasets/concrete_strength.md) | **8.17%** | 8.85% | 8.65% | 2.5% | -0.21% | +0.48% | See [Limitations](#concrete-limitations-with-dominant-features) |
+| [Medical Insurance](docs/datasets/medical_insurance.md) | 26.99% | 27.45% | **26.42%** | 2.5% | -1.03% | -0.57% | |
 
 *\*n_warmup expressed as % of total trees from the monotonic model without warm up*
 
