@@ -1,13 +1,14 @@
 #Claude
 .CLAUDE.md
 
-# Data files (but not config)
+# Data files (but not config and results)
 *.csv
 !config/*.csv
 *.png
 data/*.zip
 data/*_tmp/
-
+!results/
+!results/**
 # Secrets
 .env
 tokens.yaml

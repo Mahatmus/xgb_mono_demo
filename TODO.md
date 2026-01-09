@@ -13,7 +13,7 @@
 - [*] 5. Do a cleanup - good readme, split of files scripts, etc.
 - [*] 6. All prints to logger
 - [*] 7. Fix the workspace thing
-- [ ] 7. Pyright and ruff
+- [*] 7. Pyright and ruff
 - [ ] 8. Final run
 - [ ] 9. Double check energy efficiency is removed everywhere
 - [ ] 10. Check that datasets are well described (variables match)

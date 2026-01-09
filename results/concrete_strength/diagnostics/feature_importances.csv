@@ -1,0 +1,9 @@
+feature,baseline,monotonic,progressive
+Cement (component 1)(kg in a m^3 mixture),17.10,11.92,11.79
+Blast Furnace Slag (component 2)(kg in a m^3 mixture),8.59,7.52,6.44
+Fly Ash (component 3)(kg in a m^3 mixture),10.11,9.82,12.05
+Water  (component 4)(kg in a m^3 mixture),11.42,11.73,12.79
+Superplasticizer (component 5)(kg in a m^3 mixture),11.60,13.13,11.85
+Coarse Aggregate  (component 6)(kg in a m^3 mixture),4.42,4.28,5.87
+Fine Aggregate (component 7)(kg in a m^3 mixture),7.12,8.04,9.59
+Age (day),29.64,33.56,29.62

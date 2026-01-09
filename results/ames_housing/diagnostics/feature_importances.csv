@@ -1,0 +1,16 @@
+feature,baseline,monotonic,progressive
+GrLivArea,3.38,3.41,4.74
+LotArea,1.98,2.74,2.16
+1stFlrSF_ratio,0.64,0.78,1.03
+TotalBsmtSF_ratio,1.28,1.04,1.10
+GarageArea_ratio,0.70,0.82,1.19
+WoodDeckSF_ratio,0.48,0.60,0.89
+OpenPorchSF_ratio,0.75,1.32,0.98
+YearBuilt,1.71,1.64,2.31
+FullBath,2.40,2.48,4.68
+Fireplaces,4.32,3.72,5.13
+OverallQual,35.76,41.38,40.89
+OverallCond,0.98,1.31,1.38
+ExterQual,21.58,18.90,14.02
+KitchenQual,12.82,9.97,10.12
+BsmtQual,11.21,9.91,9.37
