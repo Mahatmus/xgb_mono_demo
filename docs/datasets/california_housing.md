@@ -1,22 +1,25 @@
 # California Housing Dataset
 
-**Source**: sklearn.datasets.fetch_california_housing
-**Instances**: 20,640 | **Features**: 8 | **Target**: MedHouseVal (Median house value in $100,000s)
+**Source**: https://www.kaggle.com/datasets/camnugent/california-housing-prices
+**Instances**: 20,640 | **Features**: 9 | **Target**: median_house_value
 
 ## Variables
 
 | Variable | Type | Description | Monotonic Constraint |
 |----------|------|-------------|---------------------|
-| **MedInc** | Continuous | Median income in block group | +1 |
-| **HouseAge** | Continuous | Median house age in block group | None |
-| **AveRooms** | Continuous | Average rooms per household | None |
-| **AveBedrms** | Continuous | Average bedrooms per household | None |
-| **Population** | Integer | Block group population | None |
-| **AveOccup** | Continuous | Average household members | None |
-| **Latitude** | Continuous | Block group latitude | None |
-| **Longitude** | Continuous | Block group longitude | None |
-| **MedHouseVal** | Continuous | **[TARGET]** Median house value | - |
+| **longitude** | Continuous | Block group longitude | None |
+| **latitude** | Continuous | Block group latitude | None |
+| **housing_median_age** | Continuous | Median age of houses in block (lower = newer) | None |
+| **total_rooms** | Integer | Total number of rooms within a block | None |
+| **total_bedrooms** | Integer | Total number of bedrooms within a block | None |
+| **population** | Integer | Total number of people residing within a block | None |
+| **households** | Integer | Total number of households (people groups in home units) in block | None |
+| **median_income** | Continuous | Median income for households in block (tens of thousands USD) | +1 |
+| **ocean_proximity** | Categorical | Location of the house w.r.t ocean/sea | None |
+| **median_house_value** | Continuous | **[TARGET]** Median house value in block (USD) | - |
 
 ## Notes
 
-**MedInc** is the only feature with an enforced monotonic constraint. Higher median income generally correlates with higher purchasing power and housing demand. However, this is an economic relationship rather than a physical law—edge cases exist (e.g., gentrifying areas, income vs. wealth distinctions).
+**median_income** is the only feature with an enforced monotonic constraint. Higher median income generally correlates with higher purchasing power and housing demand. However, this is an economic relationship rather than a physical law—edge cases exist (e.g., gentrifying areas, income vs. wealth distinctions).
+
+Houses with median_house_value > $500,000 are removed as these represent censored/capped values in the original data.

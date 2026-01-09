@@ -14,9 +14,10 @@
 - [*] 6. All prints to logger
 - [*] 7. Fix the workspace thing
 - [*] 7. Pyright and ruff
-- [ ] 8. Final run
-- [ ] 9. Double check energy efficiency is removed everywhere
-- [ ] 10. Check that datasets are well described (variables match)
+- [*] 8. Final run
+- [*] 9. Double check energy efficiency is removed everywhere
+- [*] 10. Check that datasets are well described (variables match)
 - [ ] 11. Generate final reports + "article"
 - [ ] 11. Clean out all extras, check readme
+- [ ] 12. Clean data out of git history
 - [ ] 12. Linkedin post
