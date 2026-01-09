@@ -207,10 +207,6 @@ Output:
     └── datasets/         # Detailed dataset descriptions
 ```
 
-## Datasets
-
-See [docs/datasets.md](docs/datasets.md) for detailed information about each dataset.
-
 ## License
 
 MIT License - see LICENSE.md
